@@ -1,0 +1,16 @@
+/node_modules
+
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+.env
+.env.staging.json
+.env.qa-staging.json
+.env.prod.json
+uploads
+deploy.sh
+.serverless
