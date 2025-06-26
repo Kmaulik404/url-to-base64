@@ -62,11 +62,18 @@ app.get("/api/file-url-to-base64/convert", async (req, res) => {
       return res.status(400).json({ error: "Missing file URL!" });
     }
 
+    let base64 = "";
+
     try {
+      const response = await axios.get(url, { responseType: "arraybuffer" });
+      base64 = Buffer.from(response.data, "binary").toString("base64");
+    } catch (error) {
       const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(url.replace(/^https?:\/\//, ""))}`;
       const response = await axios.get(proxyUrl, { responseType: "arraybuffer" });
-      const base64 = Buffer.from(response.data, "binary").toString("base64");
+      base64 = Buffer.from(response.data, "binary").toString("base64");
+    }
 
+    if (base64 && base64 !== "") {
       let contentType = "application/octet-stream";
       try {
         const extension = path.extname(new URL(url).pathname).toLowerCase();
@@ -74,7 +81,7 @@ app.get("/api/file-url-to-base64/convert", async (req, res) => {
       } catch (error) { }
 
       res.status(200).json({ base64: `data:${contentType};base64,${base64}` });
-    } catch (error) {
+    } else {
       res.status(500).json({ error: "Something went wrong!" });
     }
   } catch (error) {
